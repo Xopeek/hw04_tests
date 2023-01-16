@@ -19,9 +19,12 @@ class PostsPagesTest(TestCase):
             'users/logged_out.html': reverse('users:logout'),
             'users/login.html': reverse('users:login'),
             'users/signup.html': reverse('users:signup'),
-            'users/password_reset_complete.html': reverse('users:password_reset_complete'),
-            'users/password_reset_done.html': reverse('users:password_reset_done'),
-            'users/password_reset_form.html': reverse('users:password_reset_form'),
+            'users/password_reset_complete.html':
+                reverse('users:password_reset_complete'),
+            'users/password_reset_done.html':
+                reverse('users:password_reset_done'),
+            'users/password_reset_form.html':
+                reverse('users:password_reset_form'),
         }
         for template, reverse_name in self.templates_pages_names.items():
             with self.subTest(reverse_name=reverse_name):
@@ -40,4 +43,3 @@ class PostsPagesTest(TestCase):
             with self.subTest(value=value):
                 form_field = response.context.get('form').fields.get(value)
                 self.assertIsInstance(form_field, expected)
-

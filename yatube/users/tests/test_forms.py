@@ -15,7 +15,7 @@ class SingUpTestUser(TestCase):
         form_data = {
             'first_name': 'Name',
             'last_name': 'Last Name',
-            'username':  'NikName',
+            'username': 'NikName',
             'email': 'test_email@gmail.com',
             'password1': 'TestPassword123',
             'password2': 'TestPassword123'
@@ -26,5 +26,6 @@ class SingUpTestUser(TestCase):
             follow=True
         )
         new_user = User.objects.last()
-        self.assertEqual(User.objects.count(), new_user_count+1)
+        self.assertRedirects(response, reverse('posts:index'))
+        self.assertEqual(User.objects.count(), new_user_count + 1)
         self.assertEqual(new_user.username, form_data['username'])

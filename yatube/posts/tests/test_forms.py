@@ -40,8 +40,11 @@ class PostFormCreateTests(TestCase):
             data=form_data,
             follow=True
         )
-        self.assertEqual(Post.objects.count(), post_count+1)
-        self.assertTrue(Post.objects.order_by('-pk')[0].text, form_data['text'])
+        self.assertRedirects(
+            response, reverse('posts:profile',kwargs={'username': self.user}))
+        self.assertEqual(Post.objects.count(), post_count + 1)
+        self.assertTrue(Post.objects.order_by('-pk')[0].text,
+                        form_data['text'])
 
     def test_post_edit_correct(self):
         edit_post = Post.objects.create(
@@ -56,8 +59,9 @@ class PostFormCreateTests(TestCase):
             data=form_data,
             follow=True
         )
+        self.assertRedirects(response, reverse(
+            'posts:post_detail', kwargs={'post_id': edit_post.pk}))
         self.assertTrue(Post.objects.filter(
             text=form_data['text'],
             id=edit_post.pk,
         ).exists())
-

@@ -43,10 +43,14 @@ class PostsPagesTest(TestCase):
     def test_pages_uses_correct_template(self):
         self.templates_pages_names = {
             reverse('posts:index'): 'posts/index.html',
-            (reverse('posts:group_list', kwargs={'slug': 'Slug'})): 'posts/group_list.html',
-            (reverse('posts:profile', kwargs={'username': 'Name'})): 'posts/profile.html',
-            (reverse('posts:post_detail', kwargs={'post_id': 1})): 'posts/post_detail.html',
-            (reverse('posts:post_edit', kwargs={'post_id': 1})): 'posts/create_post.html',
+            (reverse('posts:group_list', kwargs={'slug': 'Slug'})):
+                'posts/group_list.html',
+            (reverse('posts:profile', kwargs={'username': 'Name'})):
+                'posts/profile.html',
+            (reverse('posts:post_detail', kwargs={'post_id': 1})):
+                'posts/post_detail.html',
+            (reverse('posts:post_edit', kwargs={'post_id': 1})):
+                'posts/create_post.html',
             reverse('posts:post_create'): 'posts/create_post.html',
         }
         for reverse_name, template in self.templates_pages_names.items():
@@ -63,7 +67,9 @@ class PostsPagesTest(TestCase):
         response = self.authorized_client.get(
             reverse('posts:group_list', kwargs={'slug': self.group.slug})
         )
-        post_group_list = list(Post.objects.filter(group_id=self.group.id)[:10])
+        post_group_list = list(Post.objects.filter(
+            group_id=self.group.id
+        )[:10])
         self.assertEqual(list(response.context['page_obj']), post_group_list)
 
     def test_profile_correct_context(self):
@@ -99,7 +105,9 @@ class PostsPagesTest(TestCase):
 
     def test_show_group_correct(self):
         form_fields = {
-            reverse('posts:index'): Post.objects.filter(group=self.post.group)[0],
+            reverse('posts:index'): Post.objects.filter(
+                group=self.post.group
+            )[0],
             reverse('posts:group_list', kwargs={'slug': self.group.slug}):
                 Post.objects.filter(group=self.post.group)[0],
             reverse('posts:profile', kwargs={'username': self.post.author}):
@@ -125,7 +133,8 @@ class PostsPagesTest(TestCase):
     def test_paginator_correct(self):
         paginator_reverse = {
             'index': reverse('posts:index'),
-            'profile': reverse('posts:profile', kwargs={'username': self.post.author})
+            'profile': reverse('posts:profile',
+                               kwargs={'username': self.post.author})
         }
         for place, page in paginator_reverse.items():
             with self.subTest(place=place):

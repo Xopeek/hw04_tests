@@ -46,10 +46,14 @@ class UsersURLTests(TestCase):
         templates_url_names = {
             'users/logged_out.html': '/auth/logout/',
             'users/login.html': '/auth/login/',
-            'users/password_reset_complete.html': '/auth/reset/done/',
-            'users/password_reset_confirm.html': '/auth/reset/<uidb64>/<token>/',
-            'users/password_reset_done.html': '/auth/password_reset/done/',
-            'users/password_reset_form.html': '/auth/password_reset/',
+            'users/password_reset_complete.html':
+                '/auth/reset/done/',
+            'users/password_reset_confirm.html':
+                '/auth/reset/<uidb64>/<token>/',
+            'users/password_reset_done.html':
+                '/auth/password_reset/done/',
+            'users/password_reset_form.html':
+                '/auth/password_reset/',
             'users/signup.html': '/auth/signup/',
         }
         for template, address in templates_url_names.items():
