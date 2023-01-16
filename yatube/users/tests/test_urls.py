@@ -8,7 +8,7 @@ User = get_user_model()
 class UsersURLTests(TestCase):
     def setUp(self):
         self.guest_client = Client()
-        self.user = User.objects.create_user(username='Name')
+        self.user = User.objects.create_user(username='Users')
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
         self.url_names_all_users = [

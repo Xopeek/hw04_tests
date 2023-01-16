@@ -13,7 +13,7 @@ class SingUpTestUser(TestCase):
     def test_create_new_user(self):
         new_user_count = User.objects.count()
         form_data = {
-            'first_name': 'Name',
+            'first_name': 'Name User',
             'last_name': 'Last Name',
             'username': 'NikName',
             'email': 'test_email@gmail.com',

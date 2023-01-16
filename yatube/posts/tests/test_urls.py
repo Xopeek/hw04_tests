@@ -11,7 +11,7 @@ User = get_user_model()
 class StaticURLTests(TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.user = User.objects.create_user(username='Name')
+        cls.user = User.objects.create_user(username='Name2')
         super().setUpClass()
         cls.group = Group.objects.create(
             title='Тестовая группа',
@@ -30,7 +30,7 @@ class StaticURLTests(TestCase):
         self.url_names_all_user = [
             '/',
             '/group/Slug/',
-            '/profile/Name/',
+            '/profile/Name2/',
             '/posts/1/',
         ]
         self.url_names_only_authorized = [
@@ -64,7 +64,7 @@ class StaticURLTests(TestCase):
         templates_url_names = {
             '/': 'posts/index.html',
             '/group/Slug/': 'posts/group_list.html',
-            '/profile/Name/': 'posts/profile.html',
+            '/profile/Name2/': 'posts/profile.html',
             '/posts/1/': 'posts/post_detail.html',
             '/posts/1/edit/': 'posts/create_post.html',
             '/create/': 'posts/create_post.html',
