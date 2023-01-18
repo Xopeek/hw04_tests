@@ -30,6 +30,7 @@ class PostsPagesTest(TestCase):
             post = Post(
                 author=cls.user,
                 text='Тестовая запись',
+                group=cls.group
             )
             posts.append(post)
         Post.objects.bulk_create(posts)
