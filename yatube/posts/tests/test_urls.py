@@ -12,6 +12,7 @@ class StaticURLTests(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.user = User.objects.create_user(username='Name2')
+        cls.user2 = User.objects.create_user(username='Name3')
         super().setUpClass()
         cls.group = Group.objects.create(
             title='Тестовая группа',
@@ -26,7 +27,9 @@ class StaticURLTests(TestCase):
     def setUp(self):
         self.guest_client = Client()
         self.authorized_client = Client()
+        self.authorized_client2 = Client()
         self.authorized_client.force_login(self.user)
+        self.authorized_client2.force_login(self.user2)
         self.url_names_all_user = [
             '/',
             '/group/Slug/',
@@ -39,28 +42,38 @@ class StaticURLTests(TestCase):
         ]
 
     def test_urls_anonymous(self):
+        """Страницы доступна любому пользователю."""
         for address in self.url_names_all_user:
             with self.subTest(address=address):
                 response = self.guest_client.get(address)
                 self.assertEqual(response.status_code, HTTPStatus.OK.value)
 
     def test_urls_redirect_anonymous(self):
+        """Страницы перенаправят анонимного
+           пользователя на страницу логина.
+        """
         for address in self.url_names_only_authorized:
             with self.subTest(address=address):
                 response = self.guest_client.get(address)
                 self.assertEqual(response.status_code, HTTPStatus.FOUND.value)
 
-    def test_create_post_author_and_create_post(self):
-        for address in self.url_names_only_authorized:
-            with self.subTest(address=address):
-                response = self.authorized_client.get(address)
-                self.assertEqual(response.status_code, HTTPStatus.OK.value)
+    def test_edit_post_author(self):
+        """Страница post_edit для автора использует правильный шаблон."""
+        response = self.authorized_client.get('/posts/1/edit/')
+        self.assertEqual(response.status_code, HTTPStatus.OK.value)
+
+    def test_edit_post_not_author(self):
+        """Страница post_edit не для автора сделает редирект."""
+        response = self.authorized_client2.get('/posts/1/edit/')
+        self.assertEqual(response.status_code, HTTPStatus.FOUND.value)
 
     def test_not_found_404(self):
+        """Страница не найдена."""
         response = self.guest_client.get('/unexisting_page/')
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND.value)
 
     def test_urls_uses_correct_template(self):
+        """Страницы используют правильный шаблон"""
         templates_url_names = {
             '/': 'posts/index.html',
             '/group/Slug/': 'posts/group_list.html',

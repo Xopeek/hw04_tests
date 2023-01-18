@@ -15,12 +15,18 @@ class PostFormCreateTests(TestCase):
         cls.user = User.objects.create_user(username='auth2')
         cls.group = Group.objects.create(
             title='Тестовая группа',
-            slug='Тестовый слаг',
+            slug='Slug',
             description='Тестовое описание',
+        )
+        cls.group2 = Group.objects.create(
+            title='Test group 2',
+            slug='Slug2',
+            description='Test description 2'
         )
         cls.post = Post.objects.create(
             author=cls.user,
             text='Тестовый пост',
+            group=cls.group
         )
         cls.form = PostForm()
 
@@ -30,6 +36,7 @@ class PostFormCreateTests(TestCase):
         self.authorized_client.force_login(self.user)
 
     def test_create_post_form(self):
+        """Валидная форма создает запись в Post."""
         post_count = Post.objects.count()
         form_data = {
             'author': self.user,
@@ -44,25 +51,38 @@ class PostFormCreateTests(TestCase):
             response, reverse(
                 'posts:profile', kwargs={'username': self.user}))
         self.assertEqual(Post.objects.count(), post_count + 1)
-        self.assertTrue(Post.objects.order_by('-pk')[0].text,
+        self.assertTrue(Post.objects.last().text,
                         form_data['text'])
+        new_post = Post.objects.last()
+        self.assertEqual(new_post.author, self.user)
+        self.assertEqual(new_post.group, self.group)
 
     def test_post_edit_correct(self):
-        edit_post = Post.objects.create(
-            author=self.user,
-            text='Текст новый 2'
-        )
+        """Валидная форма изменяет запись в Post."""
+        posts_count = Post.objects.count()
         form_data = {
-            'text': 'Тестовая запись с правками'
+            'text': 'Тестовая запись с правками',
+            'group': self.group2.pk
         }
         response = self.authorized_client.post(
-            reverse('posts:post_edit', kwargs={'post_id': edit_post.pk}),
+            reverse('posts:post_edit', kwargs={'post_id': self.post.pk}),
             data=form_data,
-            follow=True
+            follow=True,
         )
         self.assertRedirects(response, reverse(
-            'posts:post_detail', kwargs={'post_id': edit_post.pk}))
+            'posts:post_detail', kwargs={'post_id': self.post.pk}))
+        self.assertEqual(Post.objects.count(), posts_count)
         self.assertTrue(Post.objects.filter(
             text=form_data['text'],
-            id=edit_post.pk,
+            id=self.post.pk,
         ).exists())
+        old_group_response = self.authorized_client.get(
+            reverse('posts:group_list', kwargs={'slug': self.group.slug})
+        )
+        new_group_response = self.authorized_client.get(
+            reverse('posts:group_list', kwargs={'slug': self.group2.slug})
+        )
+        self.assertEqual(
+            old_group_response.context['page_obj'].paginator.count, 0)
+        self.assertEqual(
+            new_group_response.context['page_obj'].paginator.count, 1)

@@ -23,13 +23,16 @@ class PostsPagesTest(TestCase):
         cls.post = Post.objects.create(
             author=cls.user,
             text='Тестовая запись для тестов',
+            group=cls.group
         )
+        posts = []
         for i in range(1, 11):
-            cls.post = Post.objects.create(
+            post = Post(
                 author=cls.user,
-                text=f'Тестовая запись {1+i}',
-                group=cls.group
+                text='Тестовая запись',
             )
+            posts.append(post)
+        Post.objects.bulk_create(posts)
 
     def setUp(self):
         self.guest_client = Client()
@@ -41,6 +44,7 @@ class PostsPagesTest(TestCase):
         }
 
     def test_pages_uses_correct_template(self):
+        """URL-адреса используют соответствующий шаблон"""
         self.templates_pages_names = {
             reverse('posts:index'): 'posts/index.html',
             (reverse('posts:group_list', kwargs={'slug': 'Slug'})):
@@ -59,11 +63,13 @@ class PostsPagesTest(TestCase):
                 self.assertTemplateUsed(response, template)
 
     def test_home_page_correct_context(self):
+        """Шаблон index сформирован с правильным контекстом."""
         response = self.authorized_client.get(reverse('posts:index'))
         post_list = list(Post.objects.all()[:10])
         self.assertEqual(list(response.context['page_obj']), post_list)
 
     def test_group_post_correct_contex(self):
+        """Шаблон group_list сформирован с правильным контекстом."""
         response = self.authorized_client.get(
             reverse('posts:group_list', kwargs={'slug': self.group.slug})
         )
@@ -73,6 +79,7 @@ class PostsPagesTest(TestCase):
         self.assertEqual(list(response.context['page_obj']), post_group_list)
 
     def test_profile_correct_context(self):
+        """Шаблон profile сформирован с правильным контекстом."""
         response = self.authorized_client.get(
             reverse('posts:profile', kwargs={'username': 'Name'})
         )
@@ -80,6 +87,7 @@ class PostsPagesTest(TestCase):
         self.assertEqual(list(response.context['page_obj']), post_profile)
 
     def test_post_detail_correct_context(self):
+        """Шаблон post_detail сформирован с правильным контекстом."""
         response = self.authorized_client.get(
             reverse('posts:post_detail', kwargs={'post_id': self.post.id})
         )
@@ -88,6 +96,7 @@ class PostsPagesTest(TestCase):
         self.assertEqual(response.context.get('post').group, self.post.group)
 
     def test_old_create_post_correct_context(self):
+        """Шаблон post_edit сформирован с правильным контекстом."""
         response = self.authorized_client.get(
             reverse('posts:post_edit', kwargs={'post_id': self.post.id})
         )
@@ -97,6 +106,7 @@ class PostsPagesTest(TestCase):
                 self.assertIsInstance(form_field, expected)
 
     def test_new_create_post_correct_context(self):
+        """Шаблон post_create сформирован с правильным контекстом."""
         response = self.authorized_client.get(reverse('posts:post_create'))
         for value, expected in self.form_fields.items():
             with self.subTest(value=value):
@@ -104,6 +114,7 @@ class PostsPagesTest(TestCase):
                 self.assertIsInstance(form_field, expected)
 
     def test_show_group_correct(self):
+        """Группа правильно отображается на главной странице."""
         form_fields = {
             reverse('posts:index'): Post.objects.filter(
                 group=self.post.group
@@ -120,6 +131,7 @@ class PostsPagesTest(TestCase):
                 self.assertIn(expected, form_field)
 
     def test_group_not_in_mistake_group(self):
+        """Пост не попал в другую группу."""
         form_fields = {
             reverse('posts:group_list', kwargs={'slug': self.group.slug}):
                 Post.objects.exclude(group=self.post.group)
@@ -131,6 +143,7 @@ class PostsPagesTest(TestCase):
                 self.assertNotIn(expected, form_field)
 
     def test_paginator_correct(self):
+        """Пагинатор правильно отображает страницы."""
         paginator_reverse = {
             'index': reverse('posts:index'),
             'profile': reverse('posts:profile',

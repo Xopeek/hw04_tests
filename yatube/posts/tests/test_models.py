@@ -31,11 +31,13 @@ class PostModelTest(TestCase):
         self.assertEqual(object_name_post, str(task_post))
 
     def test_text_label(self):
+        """Проверяем, что у моделей правильно работает verbose_name."""
         task = PostModelTest.post
         verbose = task._meta.get_field('text').verbose_name
         self.assertEqual(verbose, 'Текст записи')
 
     def test_text_help_text(self):
+        """Проверяем, что у моделей правильно работает help_text."""
         task = PostModelTest.post
         help_text = task._meta.get_field('text').help_text
         self.assertEqual(help_text, 'Введите текст записи')

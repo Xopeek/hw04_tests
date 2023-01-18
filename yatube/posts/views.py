@@ -70,7 +70,6 @@ def post_create(request):
             return redirect(
                 'posts:profile', form.author
             )
-        return render(request, template, context)
     return render(request, template, context)
 
 
