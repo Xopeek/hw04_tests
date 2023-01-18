@@ -114,7 +114,7 @@ class PostsPagesTest(TestCase):
                 self.assertIsInstance(form_field, expected)
 
     def test_show_group_correct(self):
-        """Группа правильно отображается на главной странице."""
+        """Группа правильно отображается на страницах."""
         form_fields = {
             reverse('posts:index'): Post.objects.filter(
                 group=self.post.group
